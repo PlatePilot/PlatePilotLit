@@ -8,6 +8,13 @@ export class HelloName extends LitElement {
   name = 'Somebody';
 
   render() : TemplateResult {
-    return html`<p>Hello, ${this.name}!</p>`;
+    return html`
+      <link rel="stylesheet" href="./_components/hello_name.css">
+      <span class="hello-name">
+        Hello, ${this.name}!
+        <p class="blue-text">Blue Text</p>
+        <slot>
+      </span>
+    `;
   }
 }

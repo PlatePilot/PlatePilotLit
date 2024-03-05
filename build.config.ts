@@ -28,7 +28,7 @@ const copyConfig : esbuild.BuildOptions = {
   ]
 }
 
-const filesConfig : esbuild.BuildOptions = {
+const indexConfig : esbuild.BuildOptions = {
   allowOverwrite: true,
   logLevel: args.logLevel ?? 'info',
   legalComments: args.develope ? 'inline' : 'none',
@@ -37,6 +37,7 @@ const filesConfig : esbuild.BuildOptions = {
   outdir: './dist',
   bundle: true,
   format: 'esm',
+  platform: 'browser',
   sourcemap: true,
   sourcesContent: true,
   entryNames: '[dir]/bundle.min',
@@ -49,17 +50,40 @@ const filesConfig : esbuild.BuildOptions = {
   ],
 }
 
+const scssConfig : esbuild.BuildOptions = {
+  allowOverwrite: true,
+  logLevel: args.logLevel ?? 'info',
+  legalComments: args.develope ? 'inline' : 'none',
+  color: true,
+  minify: !args.develope ?? true,
+  outdir: './dist',
+  bundle: true,
+  format: 'esm',
+  platform: 'browser',
+  sourcemap: true,
+  sourcesContent: true,
+  entryNames: '[dir]/[name]',
+  entryPoints: [
+    './src/**/_components/**.scss',
+  ],
+  plugins: [
+    esbuildPluginSass()
+  ],
+}
+
 console.log('Build process started.');
 
 const timestampNow = Date.now();
 
 if (args.watch) {
   esbuild.context(copyConfig).then((context) => context.watch());
-  esbuild.context(filesConfig).then((context) => context.watch());
+  esbuild.context(scssConfig).then((context) => context.watch());
+  esbuild.context(indexConfig).then((context) => context.watch());
 } else {
   Promise.all([
     esbuild.build(copyConfig),
-    esbuild.build(filesConfig),
+    esbuild.build(scssConfig),
+    esbuild.build(indexConfig),
   ]).then(() => {
     esbuild.stop();
     console.log(green(`esbuild ${esbuild.version} finished build in ${(Date.now() - timestampNow).toString()}ms.`));
